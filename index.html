@@ -62,6 +62,7 @@ h2{font-size:18px;margin:4px 0 0}
 .coin{width:120px;height:120px;background:repeating-conic-gradient(#d5dadd 0 3deg,#8c969b 3deg 6deg);box-shadow:0 4px 10px rgba(0,0,0,.25);font-size:inherit}
 .cf{width:104px;height:104px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fafbfb,#b4bcc0 70%,#8f989d);display:grid;align-content:center;justify-items:center;color:#46535a;box-shadow:inset 0 0 0 3px #c9cfd3,inset 0 0 0 5px #7d878c}
 .cf b{font:800 44px/1 "Bricolage Grotesque",sans-serif}.cf small{font:700 10px Rubik,sans-serif;letter-spacing:.12em;margin-top:2px}
+.btns{display:grid;gap:6px}.btns .buy{padding:8px 10px;font-size:13px}
 [hidden]{display:none!important}.stk{flex-wrap:wrap}.row{display:flex;gap:6px;flex-wrap:wrap}.row .buy{min-width:0;padding:8px 10px}.wrap>div:first-child h2{margin-top:18px}.ach{opacity:.5}.ach.on{opacity:1}.ach .t{font-size:22px}#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--brass);color:var(--brassink);padding:10px 16px;border-radius:12px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .3s;max-width:90%;text-align:center}#toast.show{opacity:1}
 .foot{grid-column:1/-1;text-align:center}
 .foot button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:8px 12px;font:14px Rubik,sans-serif;cursor:pointer}
@@ -130,10 +131,15 @@ const BIZ=[
 ["Владыка банка",1.4e13,6.5e7,"bank"],
 ["Частный остров",2e14,4.3e8,"island"],
 ["Бенчики на Луне",3e15,2.9e9,"moon"],
-["Центробанк в кармане",5e16,2e10,"cb"]];
+["Центробанк в кармане",5e16,2e10,"cb"],
+["Автосалон Туарегов",8e17,1.4e11,"dealer"],
+["Кран-холдинг Антохи",1.2e19,9.5e11,"kran"],
+["Студия Плойка Games",1.8e20,6.5e12,"ployka"],
+["Медиа Никитурика",2.8e21,4.5e13,"nikit"],
+["Бенчики на Марсе",4.5e22,3.2e14,"mars"]];
 const RANKS=[[0,"Лоточник"],[1e3,"Предприниматель"],[2e4,"Владелец бизнеса"],[5e5,"Директор компании"],
-[1e7,"Миллионер"],[3e8,"Магнат"],[1e10,"Миллиардер"],[1e12,"Владелец империи"]];
-const SUF=["","тыс","млн","млрд","трлн","квдр","квнт"];
+[1e7,"Миллионер"],[3e8,"Магнат"],[1e10,"Миллиардер"],[1e12,"Владелец империи"],[1e14,"Властелин отраслей"],[1e16,"Беник-император"],[1e19,"Хозяин континента"],[1e22,"Повелитель планеты"],[1e26,"Владыка Вселенной"]];
+const SUF=["","тыс","млн","млрд","трлн","квдр","квнт","скст","сптл","октл"];
 function fmt(n){if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n).toString();
  let i=Math.min(Math.floor(Math.log10(n)/3),SUF.length-1);return (n/Math.pow(1000,i)).toFixed(2)+" "+SUF[i];}
 const STK=[["БЕН","Бенчики",100,.05],["НЕФТ","Нефтянка",250,.04],["АГАВ","Агава",1000,.07],["ПЛОЙ","Плойка-Холдинг",60,.08]];
@@ -147,15 +153,19 @@ try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&typeof o
  delete S.bz;delete S.sz;delete S.pz;if(!Array.isArray(S.a))S.a=[];}}}catch(e){}
 const $=id=>document.getElementById(id);
 const cost=i=>BIZ[i][1]*Math.pow(1.15,S.b[i]);
+const totC=(i,n)=>cost(i)*(Math.pow(1.15,n)-1)/.15;
+function maxQ(i){let q=Math.floor(Math.log(1+S.m*.15/cost(i))/Math.log(1.15));if(!isFinite(q)||q<0)q=0;
+ while(q>0&&totC(i,q)>S.m)q--;while(totC(i,q+1)<=S.m)q++;return q;}
 const upCost=()=>25*Math.pow(2.4,S.c);
 const power=()=>Math.ceil(Math.pow(1.6,S.c)*pm()*(Date.now()<cmEnd?cm:1));
 let mu=1,muEnd=0,cm=1,cmEnd=0;const ips=()=>BIZ.reduce((a,b,i)=>a+b[2]*S.b[i]*bm(S.b[i]),0)*pm()*(Date.now()<muEnd?mu:1);
 const list=$("list"),els=[];
 BIZ.forEach((b,i)=>{
  const d=document.createElement("div");d.className="card";
- d.innerHTML='<div class="cnt"></div><div class="info"><b>'+b[0]+'</b><span></span></div><button class="buy" type="button"></button>';
+ d.innerHTML='<div class="cnt"></div><div class="info"><b>'+b[0]+'</b><span></span></div><div class="btns"><button class="buy" type="button"></button><button class="buy" type="button"></button></div>';
  list.appendChild(d);
- const e={cnt:d.children[0],sub:d.querySelector("span"),btn:d.querySelector("button")};
+ const bt=d.querySelectorAll("button"),e={cnt:d.children[0],sub:d.querySelector("span"),btn:bt[0],mx:bt[1]};
+ e.mx.onclick=()=>{const q=maxQ(i);if(q>0){S.m-=totC(i,q);S.b[i]+=q;S.nb+=q;FX.buy();draw();}};
  e.btn.onclick=()=>{const c=cost(i);if(S.m>=c){S.m-=c;S.b[i]++;S.nb++;FX.buy();draw();}};
  els.push(e);
 });
@@ -180,7 +190,7 @@ function draw(){check();drawStk();drawQ();drawP();
  $("upbtn").textContent=fmt(uc)+" ₽";$("upbtn").disabled=S.m<uc;
  BIZ.forEach((b,i)=>{const c=cost(i),e=els[i];
   e.cnt.textContent=S.b[i];{const nx=[10,25,50,100].find(x=>S.b[i]<x);e.sub.textContent="+"+fmt(b[2]*bm(S.b[i]))+" ₽ в сек. каждый"+(nx?", ×2 при "+nx:"");}
-  e.btn.textContent="Купить "+fmt(c)+" ₽";e.btn.disabled=S.m<c;});
+  e.btn.textContent="Купить "+fmt(c)+" ₽";e.btn.disabled=S.m<c;const q=maxQ(i);e.mx.textContent="Макс ×"+q;e.mx.disabled=q<1;});
 }
 const ACH=[
 ["Вы пробудили Никитурика","Заработать 1 000 ₽",()=>S.t>=1000,.10],
@@ -198,7 +208,12 @@ const ACH=[
 ["Монетка улыбнулась","Выиграть в монетку",()=>S.w>=1,.10],
 ["Империя продана","Продать империю впервые",()=>S.pr>=1,.20],
 ["Постоянный клиент","Забирать награду 3 дня подряд",()=>S.ds>=3,.15],
-["Игрок","Сыграть в мини-игру",()=>S.gm>=1,.10]];
+["Игрок","Сыграть в мини-игру",()=>S.gm>=1,.10],
+["БэМэВЭЭЭЭЭЭЭ в гараже","Открыть 11-й уровень",()=>S.b[10]>0,.12],
+["Сотка","Купить 100 одинаковых бизнесов",()=>S.b.some(x=>x>=100),.15],
+["Снайпер","Попасть 20 раз в тире за один раунд",()=>(S.tb||0)>=20,.15],
+["Неделя без пропусков","Забирать награду 7 дней подряд",()=>S.ds>=7,.20],
+["Династия","Продать империю 3 раза",()=>S.pr>=3,.20]];
 let tt;
 function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),3000);}
 function drawAch(){$("ach").innerHTML=ACH.map((a,i)=>{const on=S.a.includes(a[0]);
@@ -316,7 +331,7 @@ function mv(){const a=$("tarea"),t=$("tgt");t.style.left=Math.random()*(a.client
 $("tgt").onclick=()=>{th++;FX.click();mv();$("tres").textContent="Попаданий: "+th+", осталось "+tl+" с";};
 $("tstart").onclick=()=>{if(tIv)return;th=0;tl=10;S.gm++;$("tgt").hidden=false;mv();$("tres").textContent="Попаданий: 0, осталось 10 с";
  tIv=setInterval(()=>{tl--;if(tl>0){$("tres").textContent="Попаданий: "+th+", осталось "+tl+" с";return;}
-  clearInterval(tIv);tIv=0;$("tgt").hidden=true;const w=th*Math.max(50,ips()*20);S.m+=w;S.t+=w;
+  clearInterval(tIv);tIv=0;$("tgt").hidden=true;S.tb=Math.max(S.tb||0,th);const w=th*Math.max(50,ips()*20);S.m+=w;S.t+=w;
   $("tres").textContent="Попаданий: "+th+". Награда: "+fmt(w)+" ₽";if(th)FX.win();draw();},1000);};
 const SB="https://jyqvxgwsbrgymbrgasoa.supabase.co",SK="sb_publishable_JrmOs5jCIMZr72dNoBXziA_AfWsa8mE";
 const HD={apikey:SK,Authorization:"Bearer "+SK,"Content-Type":"application/json"};
