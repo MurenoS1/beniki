@@ -56,9 +56,12 @@ h2{font-size:18px;margin:4px 0 0}
 .coin{width:110px;height:110px;margin:0 auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9a3,var(--brass));color:var(--brassink);display:grid;place-items:center;font:800 40px "Bricolage Grotesque",sans-serif;box-shadow:inset 0 0 0 6px rgba(0,0,0,.12)}
 .coin.spin{animation:fl .9s ease-in-out}@keyframes fl{to{transform:rotateY(1080deg)}}
 @media(prefers-reduced-motion:reduce){.coin.spin{animation:none}}
-#bet{font:500 18px Rubik,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-align:center;width:100%}
+#bet,#gbet{font:500 18px Rubik,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-align:center;width:100%}
 .tabs{max-width:none;overflow-x:auto}.tab{flex:1 0 auto;padding:10px 14px}.cbox h2{margin:0 0 12px}
 #v2{display:grid;gap:16px}#tarea{position:relative;height:200px;border:1px dashed var(--line);border-radius:12px;overflow:hidden}#tgt{position:absolute;width:48px;height:48px;border-radius:50%;border:0;background:var(--brass);font-size:24px;cursor:pointer;padding:0}
+.coin{width:120px;height:120px;background:repeating-conic-gradient(#d5dadd 0 3deg,#8c969b 3deg 6deg);box-shadow:0 4px 10px rgba(0,0,0,.25);font-size:inherit}
+.cf{width:104px;height:104px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fafbfb,#b4bcc0 70%,#8f989d);display:grid;align-content:center;justify-items:center;color:#46535a;box-shadow:inset 0 0 0 3px #c9cfd3,inset 0 0 0 5px #7d878c}
+.cf b{font:800 44px/1 "Bricolage Grotesque",sans-serif}.cf small{font:700 10px Rubik,sans-serif;letter-spacing:.12em;margin-top:2px}
 [hidden]{display:none!important}.stk{flex-wrap:wrap}.row{display:flex;gap:6px;flex-wrap:wrap}.row .buy{min-width:0;padding:8px 10px}.wrap>div:first-child h2{margin-top:18px}.ach{opacity:.5}.ach.on{opacity:1}.ach .t{font-size:22px}#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--brass);color:var(--brassink);padding:10px 16px;border-radius:12px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .3s;max-width:90%;text-align:center}#toast.show{opacity:1}
 .foot{grid-column:1/-1;text-align:center}
 .foot button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:8px 12px;font:14px Rubik,sans-serif;cursor:pointer}
@@ -92,7 +95,7 @@ h2{font-size:18px;margin:4px 0 0}
   
 </div>
 <div class="cbox" id="v2" hidden><div class="pn">
-  <div class="coin" id="coin">₽</div>
+  <div class="coin" id="coin"><div class="cf"><b id="cb">5</b><small id="cs">РУБЛЕЙ</small></div></div>
   <p id="cres">Выберите ставку и сторону монеты. Угадаете, и ставка удвоится.</p>
   <input id="bet" inputmode="numeric" placeholder="Ставка, ₽" aria-label="Ставка в рублях">
   <div class="row"><button class="buy" type="button" data-f="0.1">10%</button><button class="buy" type="button" data-f="0.25">25%</button><button class="buy" type="button" data-f="0.5">50%</button><button class="buy" type="button" data-f="1">Всё</button></div>
@@ -100,6 +103,7 @@ h2{font-size:18px;margin:4px 0 0}
 </div>
 <div class="pn"><b>Угадай число</b><p id="gres">Поставьте на число от 1 до 5. Угадаете, и ставка вернётся ×4,5.</p>
   <input id="gbet" inputmode="numeric" placeholder="Ставка, ₽" aria-label="Ставка в рублях">
+  <div class="row"><button class="buy" type="button" data-gf="0.1">10%</button><button class="buy" type="button" data-gf="0.25">25%</button><button class="buy" type="button" data-gf="0.5">50%</button><button class="buy" type="button" data-gf="1">Всё</button></div>
   <div class="row"><button class="buy" type="button" data-g="1">1</button><button class="buy" type="button" data-g="2">2</button><button class="buy" type="button" data-g="3">3</button><button class="buy" type="button" data-g="4">4</button><button class="buy" type="button" data-g="5">5</button></div></div>
 <div class="pn"><b>Тир на скорость</b><p id="tres">Попадайте по мишени 10 секунд. Награда зависит от вашего дохода.</p>
   <div id="tarea"><button id="tgt" type="button" hidden aria-label="Мишень">🎯</button></div><button class="buy" id="tstart" type="button">Начать</button></div></div>
@@ -132,7 +136,7 @@ const SUF=["","тыс","млн","млрд","трлн","квдр","квнт"];
 function fmt(n){if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n).toString();
  let i=Math.min(Math.floor(Math.log10(n)/3),SUF.length-1);return (n/Math.pow(1000,i)).toFixed(2)+" "+SUF[i];}
 const STK=[["БЕН","Бенчики",100,.05],["НЕФТ","Нефтянка",250,.04],["АГАВ","Агава",1000,.07],["ПЛОЙ","Плойка-Холдинг",60,.08]];
-const fresh=()=>({m:0,t:0,c:0,a:[],k:0,g:0,x:0,w:0,snd:true,vib:true,t0:0,pp:0,pr:0,nb:0,ns:0,gm:0,dd:0,ds:0,qa:[],qb:{},ts:Date.now(),s:STK.map(()=>0),p:STK.map(x=>x[2]),b:BIZ.map(()=>0)});
+const fresh=()=>({m:0,t:0,c:0,a:[],k:0,g:0,x:0,w:0,snd:true,vib:true,t0:0,pp:0,pr:0,nb:0,ns:0,gm:0,dd:0,dt:0,ds:0,qa:[],qc:[0,0,0],qb:{},ts:Date.now(),s:STK.map(()=>0),p:STK.map(x=>x[2]),b:BIZ.map(()=>0)});
 const KEY="benik1";
 let S=fresh();
 try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&typeof o=="object"){S=Object.assign(S,o);
@@ -178,27 +182,27 @@ function draw(){check();drawStk();drawQ();drawP();
   e.btn.textContent="Купить "+fmt(c)+" ₽";e.btn.disabled=S.m<c;});
 }
 const ACH=[
-["Вы пробудили Никитурика","Заработать 1 000 ₽",()=>S.t>=1000],
-["Антоха кран","Заработать 5 000 ₽",()=>S.t>=5000],
-["Спрячь мои ладони","Заработать 10 000 ₽",()=>S.t>=10000],
-["Заброним плойку после работы","Открыть 8-й уровень",()=>S.b[7]>0],
-["Первый миллион","Заработать 1 000 000 ₽",()=>S.t>=1e6],
-["Миллиардер","Заработать 1 000 000 000 ₽",()=>S.t>=1e9],
-["Палец чемпиона","Нажать 1 000 раз",()=>S.k>=1000],
-["Не все яйца в одну корзину","Открыть 5 разных бизнесов",()=>S.b.filter(x=>x>0).length>=5],
-["Коллекционер","Открыть все бизнесы",()=>S.b.every(x=>x>0)],
-["Биржевой волк","Купить первую акцию",()=>S.s.some(x=>x>0)],
-["Инвестор на связи","Забрать бонус от инвестора",()=>S.g>=1],
-["Налоговая тебя нашла","Пережить налоговую проверку",()=>S.x>=1],
-["Монетка улыбнулась","Выиграть в монетку",()=>S.w>=1],
-["Империя продана","Продать империю впервые",()=>S.pr>=1],
-["Постоянный клиент","Забирать награду 3 дня подряд",()=>S.ds>=3],
-["Игрок","Сыграть в мини-игру",()=>S.gm>=1]];
+["Вы пробудили Никитурика","Заработать 1 000 ₽",()=>S.t>=1000,.10],
+["Антоха кран","Заработать 5 000 ₽",()=>S.t>=5000,.10],
+["Спрячь мои ладони","Заработать 10 000 ₽",()=>S.t>=10000,.10],
+["Заброним плойку после работы","Открыть 8-й уровень",()=>S.b[7]>0,.12],
+["Первый миллион","Заработать 1 000 000 ₽",()=>S.t>=1e6,.12],
+["Миллиардер","Заработать 1 000 000 000 ₽",()=>S.t>=1e9,.15],
+["Палец чемпиона","Нажать 1 000 раз",()=>S.k>=1000,.12],
+["Не все яйца в одну корзину","Открыть 5 разных бизнесов",()=>S.b.filter(x=>x>0).length>=5,.12],
+["Коллекционер","Открыть все бизнесы",()=>S.b.every(x=>x>0),.20],
+["Биржевой волк","Купить первую акцию",()=>S.s.some(x=>x>0),.10],
+["Инвестор на связи","Забрать бонус от инвестора",()=>S.g>=1,.10],
+["Налоговая тебя нашла","Пережить налоговую проверку",()=>S.x>=1,.10],
+["Монетка улыбнулась","Выиграть в монетку",()=>S.w>=1,.10],
+["Империя продана","Продать империю впервые",()=>S.pr>=1,.20],
+["Постоянный клиент","Забирать награду 3 дня подряд",()=>S.ds>=3,.15],
+["Игрок","Сыграть в мини-игру",()=>S.gm>=1,.10]];
 let tt;
 function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),3000);}
 function drawAch(){$("ach").innerHTML=ACH.map((a,i)=>{const on=S.a.includes(a[0]);
- return '<div class="card ach'+(on?' on':'')+'"><div class="t">'+(on?'🏆':'🔒')+'</div><div class="info"><b>'+(on?a[0]:'???')+'</b><span>'+a[1]+'</span></div></div>';}).join("");}
-function check(){let ch=false;ACH.forEach((a,i)=>{if(!S.a.includes(a[0])&&a[2]()){S.a.push(a[0]);ch=true;toast("Достижение: "+a[0]);FX.ach();}});if(ch){drawAch();save();}}
+ return '<div class="card ach'+(on?' on':'')+'"><div class="t">'+(on?'🏆':'🔒')+'</div><div class="info"><b>'+(on?a[0]:'???')+'</b><span>'+a[1]+'. Награда: '+Math.round(a[3]*100)+'% дохода за час</span></div></div>';}).join("");}
+function check(){let ch=false;ACH.forEach((a,i)=>{if(!S.a.includes(a[0])&&a[2]()){S.a.push(a[0]);ch=true;const rw=Math.max(20,ips()*3600*a[3]);S.m+=rw;S.t+=rw;toast("Достижение: "+a[0]+" (+"+fmt(rw)+" ₽)");FX.ach();}});if(ch){drawAch();save();}}
 const stk=$("stk"),se=[];
 STK.forEach((t,i)=>{const d=document.createElement("div");d.className="card stk";
  d.innerHTML='<div class="info"><b></b><span></span></div><div class="row"><button class="buy" type="button">Купить</button><button class="buy" type="button">Макс</button><button class="buy" type="button">Продать всё</button></div>';
@@ -238,9 +242,9 @@ function flip(side){
  if(!(b>=1)){r.textContent="Введите ставку от 1 ₽";return;}
  if(b>S.m){r.textContent="Ставка больше вашего баланса";return;}
  busy=true;FX.flip();S.m-=b;draw();
- const c=$("coin");c.textContent="₽";c.classList.remove("spin");void c.offsetWidth;c.classList.add("spin");r.textContent="Монета в воздухе…";
+ const c=$("coin");face(1);c.classList.remove("spin");void c.offsetWidth;c.classList.add("spin");r.textContent="Монета в воздухе…";
  setTimeout(()=>{const win=Math.random()<.5,res=win?side:1-side;
-  c.textContent=res?"Р":"О";
+  face(res);
   const nm=res?"Выпала решка. ":"Выпал орёл. ";
   if(win){S.m+=b*2;S.t+=b;S.w++;FX.win();r.textContent=nm+"Ставка удвоена: +"+fmt(b)+" ₽";}
   else{FX.lose();r.textContent=nm+"Ставка потеряна: −"+fmt(b)+" ₽";}
@@ -274,23 +278,30 @@ function drawP(){const g=pGain();$("pinfo").textContent="Очки влияния
  $("pbtn").textContent="Продать империю (+"+g+")";$("pbtn").disabled=g<1;}
 $("pbtn").onclick=()=>{const g=pGain();if(g<1||!confirm("Продать империю и получить очков влияния: "+g+"?"))return;
  S.pp+=g;S.pr++;Object.assign(S,{m:0,c:0,b:BIZ.map(()=>0),s:STK.map(()=>0),p:STK.map(x=>x[2]),t0:S.t});save();FX.ach();toast("Империя продана. Очки влияния: +"+g);drawAch();draw();};
-const day=()=>Math.floor(Date.now()/864e5);
-const dn=()=>S.dd==day()-1?(S.ds||0)+1:1;
-const dAmt=n=>Math.max(1000,ips()*900)*(1+.25*Math.min(n-1,6));
-const QP=[["Нажать 200 раз","k",200],["Купить 5 бизнесов","nb",5],["Выиграть 2 раза в монетку","w",2],["Купить акции 3 раза","ns",3],["Забрать бонус инвестора","g",1],["Сыграть 3 раза в мини-игры","gm",3]];
-const qprog=i=>Math.min(QP[i][2],(S[QP[i][1]]||0)-(S.qb[i]||0)),qrw=()=>Math.max(2000,ips()*300);
+const H24=864e5;
+const dn=()=>Date.now()-(S.dt||0)<2*H24?(S.ds||0)+1:1;
+const dAmt=n=>Math.max(10,ips()*3600*.02)*(1+.25*Math.min(n-1,6));
+const QP=[["Нажать 200 раз","k",200,.03],["Купить 5 бизнесов","nb",5,.04],["Выиграть 2 раза в монетку","w",2,.03],["Купить акции 3 раза","ns",3,.03],["Забрать бонус инвестора","g",1,.02],["Сыграть 3 раза в мини-игры","gm",3,.05]];
+const qprog=i=>Math.min(QP[i][2],(S[QP[i][1]]||0)-(S.qb[i]||0)),qrw=i=>Math.max(5,ips()*3600*QP[i][3]);
+const fT=ms=>{const t=Math.max(0,Math.ceil(ms/1000)),z=x=>String(x).padStart(2,"0");return z(Math.floor(t/3600))+":"+z(Math.floor(t%3600/60))+":"+z(t%60);};
 let qh="";
-function qInit(){while(S.qa.length<3){const c=QP.map((q,i)=>i).filter(i=>!S.qa.includes(i));const i=c[Math.floor(Math.random()*c.length)];S.qa.push(i);S.qb[i]=S[QP[i][1]]||0;}}
-function drawQ(){qInit();const cl=S.dd==day();
- let h='<div class="card"><div class="info"><b>Ежедневная награда</b><span>Серия: '+(S.ds||0)+' дн. Чем длиннее серия, тем больше награда</span></div><button class="buy" data-d="1"'+(cl?' disabled':'')+'>'+(cl?'Завтра снова':'Забрать '+fmt(dAmt(dn()))+' ₽')+'</button></div>';
- S.qa.forEach(i=>{const q=QP[i],p=qprog(i);h+='<div class="card"><div class="info"><b>'+q[0]+'</b><span>'+p+' из '+q[2]+'</span></div><button class="buy" data-q="'+i+'"'+(p>=q[2]?'':' disabled')+'>Забрать '+fmt(qrw())+' ₽</button></div>';});
- if(h!==qh){qh=h;$("qs").innerHTML=h;}}
+function qInit(){if(!S.qc)S.qc=[0,0,0];for(let j=0;j<3;j++){if((S.qa[j]==null||S.qa[j]<0)&&Date.now()>=(S.qc[j]||0)){
+ const c=QP.map((x,i)=>i).filter(i=>!S.qa.includes(i));if(!c.length)break;const i=c[Math.floor(Math.random()*c.length)];S.qa[j]=i;S.qb[i]=S[QP[i][1]]||0;}}}
+function drawQ(){qInit();const now=Date.now(),dt=(S.dt||0)+H24,cl=now<dt;
+ let h='<div class="card"><div class="info"><b>Ежедневная награда</b><span>Серия: '+(S.ds||0)+' дн'+(cl?'. Следующая через <span class="tm" data-ts="'+dt+'"></span>':'. Чем длиннее серия, тем больше награда')+'</span></div><button class="buy" data-d="1"'+(cl?' disabled':'')+'>'+(cl?'Позже':'Забрать '+fmt(dAmt(dn()))+' ₽')+'</button></div>';
+ for(let j=0;j<3;j++){const i=S.qa[j];
+  if(i==null||i<0){h+='<div class="card"><div class="info"><b>Следующее задание</b><span>Откроется через <span class="tm" data-ts="'+(S.qc[j]||0)+'"></span></span></div><button class="buy" disabled>Ожидание</button></div>';continue;}
+  const q=QP[i],p=qprog(i);h+='<div class="card"><div class="info"><b>'+q[0]+'</b><span>'+p+' из '+q[2]+'</span></div><button class="buy" data-q="'+j+'"'+(p>=q[2]?'':' disabled')+'>Забрать '+fmt(qrw(i))+' ₽</button></div>';}
+ if(h!==qh){qh=h;$("qs").innerHTML=h;}
+ document.querySelectorAll(".tm").forEach(e=>{e.textContent=fT(e.dataset.ts-now);});}
 $("qs").onclick=e=>{const t=e.target.closest("button");if(!t||t.disabled)return;
- if(t.dataset.d){const n=dn(),a=dAmt(n);S.ds=n;S.dd=day();S.m+=a;S.t+=a;FX.win();toast("Награда: +"+fmt(a)+" ₽");}
- else{const i=+t.dataset.q;if(qprog(i)>=QP[i][2]){const a=qrw();S.m+=a;S.t+=a;S.qa=S.qa.filter(x=>x!=i);FX.win();toast("Задание выполнено: +"+fmt(a)+" ₽");}}
+ if(t.dataset.d){const n=dn(),a=dAmt(n);S.ds=n;S.dt=Date.now();S.m+=a;S.t+=a;FX.win();toast("Награда: +"+fmt(a)+" ₽");}
+ else{const j=+t.dataset.q,i=S.qa[j];if(i>=0&&qprog(i)>=QP[i][2]){const a=qrw(i);S.m+=a;S.t+=a;S.qa[j]=-1;S.qc[j]=Date.now()+H24;FX.win();toast("Задание выполнено: +"+fmt(a)+" ₽");}}
  qh="";draw();};
-function offline(){const dt=Math.min((Date.now()-(S.ts||Date.now()))/1000,28800),g=ips()*dt*.5;
+function offline(){const dt=Math.min((Date.now()-(S.ts||Date.now()))/1000,5400),g=ips()*dt*.5;
  if(dt>60&&g>=1){S.m+=g;S.t+=g;setTimeout(()=>toast("Пока вас не было: +"+fmt(g)+" ₽"),600);}}
+function face(r){$("cb").textContent=r?"5":"🦅";$("cs").textContent=r?"РУБЛЕЙ":"БАНК РОССИИ";}
+document.querySelectorAll("[data-gf]").forEach(b=>b.onclick=()=>{$("gbet").value=Math.max(0,Math.floor(S.m*b.dataset.gf));});
 document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
  const bt=Math.floor(Number(($("gbet").value||"").replace(/\s/g,""))),r=$("gres");
  if(!(bt>=1)){r.textContent="Введите ставку от 1 ₽";return;}
