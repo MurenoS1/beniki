@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Империя беников</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Rubik:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e4ebe2;--g1:#fff;--g2:#b4e68f;--panel:#f4f7f1;--ink:#12342b;--mute:#5b7168;--brass:#b8892b;--brassink:#fff;--line:#c5d2c6;--bad:#a8402b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e231e;--g1:#0e231e;--g2:#1d4d33;--panel:#173a31;--ink:#e6efe5;--mute:#9bb3a8;--brass:#d9a840;--brassink:#1b1405;--line:#2a5246;--bad:#e07a62}}
+:root[data-theme="dark"]{--bg:#0e231e;--g1:#0e231e;--g2:#1d4d33;--panel:#173a31;--ink:#e6efe5;--mute:#9bb3a8;--brass:#d9a840;--brassink:#1b1405;--line:#2a5246;--bad:#e07a62}
+*{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg) linear-gradient(160deg,var(--g1),var(--g2)) fixed;color:var(--ink);font:16px/1.45 Rubik,system-ui,sans-serif;min-height:100%}
+.wrap{max-width:900px;margin:0 auto;padding:16px;display:grid;gap:16px}
+@media(min-width:760px){.wrap{grid-template-columns:5fr 6fr;align-items:start}}
+h1,h2,.num{font-family:"Bricolage Grotesque",Rubik,system-ui,sans-serif}
+.top{background:var(--ink);color:var(--bg);border-radius:18px;padding:20px;position:relative;overflow:hidden}
+h1{font-size:24px;margin:0 0 10px;line-height:1.1}.rank{font-size:14px;opacity:.8}
+.money{font-size:clamp(34px,9vw,52px);font-weight:800;line-height:1.1;margin:4px 0}
+.ips{font-size:14px;opacity:.8}
+.bar{height:6px;background:rgba(255,255,255,.18);border-radius:3px;margin-top:14px}
+.bar i{display:block;height:100%;width:0;background:var(--brass);border-radius:3px;transition:width .3s}
+#click{width:100%;margin-top:16px;border:0;border-radius:18px;padding:30px 12px;background:var(--brass);color:var(--brassink);font:800 24px "Bricolage Grotesque",Rubik,sans-serif;cursor:pointer;position:relative;overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+#click small{display:block;font:500 14px Rubik,sans-serif;opacity:.85;margin-top:4px}
+#click:active{transform:scale(.98)}
+.pop{position:absolute;font:700 20px "Bricolage Grotesque",sans-serif;pointer-events:none;animation:up .8s ease-out forwards}
+@keyframes up{to{transform:translateY(-70px);opacity:0}}
+@media(prefers-reduced-motion:reduce){.pop{animation:none;opacity:0}#click:active{transform:none}.bar i{transition:none}}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.side{display:grid;gap:12px}
+h2{font-size:18px;margin:4px 0 0}
+.card{display:flex;align-items:center;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.card .info{flex:1;min-width:0}
+.card b{display:block}
+.card span{font-size:13px;color:var(--mute)}
+.buy{border:0;border-radius:10px;padding:10px 12px;min-width:104px;background:var(--ink);color:var(--bg);font:500 14px Rubik,sans-serif;cursor:pointer}
+.buy:disabled{background:var(--line);color:var(--mute);cursor:not-allowed}
+.cnt{font:800 22px "Bricolage Grotesque",sans-serif;color:var(--brass);min-width:34px;text-align:center}
+.top{background:linear-gradient(135deg,#12342b 0%,#2c6a4b 55%,#8cc84b 130%);color:#fff;aspect-ratio:1.586;min-height:196px;max-width:400px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 10px 24px rgba(18,52,43,.25)}
+.top::after{content:"";position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none}
+.top h1{font-size:16px;margin:0}.top .money{font-size:clamp(30px,8vw,40px);margin:0}
+.r1,.r3{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chip{width:42px;height:30px;border-radius:6px;background:linear-gradient(135deg,#f3d27a,#b8892b)}
+.pan{font:500 14px Rubik,sans-serif;letter-spacing:.12em;opacity:.85}
+.head{max-width:900px;margin:0 auto;padding:16px 16px 0;display:grid;gap:12px}
+.head #evt{max-width:400px}
+.tabs{display:flex;gap:8px;max-width:400px}
+.tab{flex:1;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:10px;font:500 15px Rubik,sans-serif;cursor:pointer}
+.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.cbox{max-width:900px;margin:16px auto;padding:0 16px}
+.pn{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px;max-width:400px;display:grid;gap:12px;text-align:center}
+.pn p{margin:0;min-height:44px}.pn .buy{flex:1;min-width:0}.pn .big{padding:16px;font-size:17px}
+.coin{width:110px;height:110px;margin:0 auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9a3,var(--brass));color:var(--brassink);display:grid;place-items:center;font:800 40px "Bricolage Grotesque",sans-serif;box-shadow:inset 0 0 0 6px rgba(0,0,0,.12)}
+.coin.spin{animation:fl .9s ease-in-out}@keyframes fl{to{transform:rotateY(1080deg)}}
+@media(prefers-reduced-motion:reduce){.coin.spin{animation:none}}
+#bet{font:500 18px Rubik,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-align:center;width:100%}
+[hidden]{display:none!important}.stk{flex-wrap:wrap}.row{display:flex;gap:6px;flex-wrap:wrap}.row .buy{min-width:0;padding:8px 10px}.wrap>div:first-child h2{margin-top:18px}.ach{opacity:.5}.ach.on{opacity:1}.ach .t{font-size:22px}#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--brass);color:var(--brassink);padding:10px 16px;border-radius:12px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .3s;max-width:90%;text-align:center}#toast.show{opacity:1}
+.foot{grid-column:1/-1;text-align:center}
+.foot button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:8px 12px;font:14px Rubik,sans-serif;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="head">
+  <div class="top">
+    <div class="r1"><h1>Империя беников</h1><span class="chip"></span></div>
+    <div><div class="money num" id="money"></div><div class="ips" id="ips"></div></div>
+    <div class="r3"><div class="rank" id="rank"></div><span class="pan">•••• 0001</span></div>
+    <div class="bar"><i id="prog"></i></div>
+  </div>
+  <div id="evt" class="card" hidden><div class="info"><b id="evt-t"></b><span id="evt-s"></span></div><button class="buy" id="evt-b" type="button" hidden>Забрать</button></div>
+  <div class="tabs"><button class="tab on" id="tb1" type="button">Бизнес</button><button class="tab" id="tb2" type="button">Монетка</button></div>
+</div>
+<div class="wrap" id="v1">
+  <div>
+    
+        <button id="click" type="button">Заработать<small id="cp"></small></button>
+    <h2>Достижения</h2><div id="ach" class="side"></div>
+  </div>
+  <div class="side">
+    <h2>Улучшения</h2>
+    <div class="card">
+      <div class="info"><b>Деловые связи</b><span id="upd"></span></div>
+      <button class="buy" id="upbtn" type="button"></button>
+    </div>
+    <h2>Биржа</h2><div id="stk" class="side"></div>
+    <h2>Бизнесы</h2>
+    <div id="list" class="side"></div>
+  </div>
+  <div class="foot"><button id="reset" type="button">Начать заново</button></div>
+</div>
+<div class="cbox" id="v2" hidden><div class="pn">
+  <div class="coin" id="coin">₽</div>
+  <p id="cres">Выберите ставку и сторону монеты. Угадаете, и ставка удвоится.</p>
+  <input id="bet" inputmode="numeric" placeholder="Ставка, ₽" aria-label="Ставка в рублях">
+  <div class="row"><button class="buy" type="button" data-f="0.1">10%</button><button class="buy" type="button" data-f="0.25">25%</button><button class="buy" type="button" data-f="0.5">50%</button><button class="buy" type="button" data-f="1">Всё</button></div>
+  <div class="row"><button class="buy big" id="heads" type="button">Орёл</button><button class="buy big" id="tails" type="button">Решка</button></div>
+</div></div>
+<div id="toast" role="status"></div>
+<script>
+const BIZ=[
+["Ларек с бенчиками",15,0.1],["Сектор лизинга",100,1],["Сельхозка",1100,8],["Нефтянка",12000,47],
+["Стройка",130000,260],["Оборонка",1.4e6,1400],["Госуха",2e7,7800],["Агава",3.3e8,44000],
+["Нуа",5.1e9,260000],["Туареговая долина",7.5e10,1.6e6],["БэМэВЭЭЭЭЭЭЭ",1e12,1e7],["Владыка банка",1.4e13,6.5e7],
+["Частный остров",2e14,4.3e8],["Бенчики на Луне",3e15,2.9e9],["Центробанк в кармане",5e16,2e10]];
+const RANKS=[[0,"Лоточник"],[1e3,"Предприниматель"],[2e4,"Владелец бизнеса"],[5e5,"Директор компании"],
+[1e7,"Миллионер"],[3e8,"Магнат"],[1e10,"Миллиардер"],[1e12,"Владелец империи"]];
+const SUF=["","тыс","млн","млрд","трлн","квдр","квнт"];
+function fmt(n){if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n).toString();
+ let i=Math.min(Math.floor(Math.log10(n)/3),SUF.length-1);return (n/Math.pow(1000,i)).toFixed(2)+" "+SUF[i];}
+const STK=[["БЕН","Бенчики",100,.05],["НЕФТ","Нефтянка",250,.04],["АГАВ","Агава",1000,.07],["ПЛОЙ","Плойка-Холдинг",60,.08]];
+const fresh=()=>({m:0,t:0,c:0,a:[],k:0,g:0,x:0,w:0,s:STK.map(()=>0),p:STK.map(x=>x[2]),b:BIZ.map(()=>0)});
+const KEY="benik1";
+let S=fresh();
+try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.b)&&o.b.length===BIZ.length)S=Object.assign(S,o);}}catch(e){}
+const $=id=>document.getElementById(id);
+const cost=i=>BIZ[i][1]*Math.pow(1.15,S.b[i]);
+const upCost=()=>25*Math.pow(2.4,S.c);
+const power=()=>Math.ceil(Math.pow(1.6,S.c));
+let mu=1,muEnd=0;const ips=()=>BIZ.reduce((a,b,i)=>a+b[2]*S.b[i],0)*(Date.now()<muEnd?mu:1);
+const list=$("list"),els=[];
+BIZ.forEach((b,i)=>{
+ const d=document.createElement("div");d.className="card";
+ d.innerHTML='<div class="cnt"></div><div class="info"><b>'+b[0]+'</b><span></span></div><button class="buy" type="button"></button>';
+ list.appendChild(d);
+ const e={cnt:d.children[0],sub:d.querySelector("span"),btn:d.querySelector("button")};
+ e.btn.onclick=()=>{const c=cost(i);if(S.m>=c){S.m-=c;S.b[i]++;draw();}};
+ els.push(e);
+});
+$("upbtn").onclick=()=>{const c=upCost();if(S.m>=c){S.m-=c;S.c++;draw();}};
+$("click").addEventListener("click",ev=>{
+ const p=power();S.m+=p;S.t+=p;S.k++;
+ const b=$("click"),r=b.getBoundingClientRect(),s=document.createElement("span");
+ s.className="pop";s.textContent="+"+fmt(p)+" ₽";
+ s.style.left=(ev.clientX?ev.clientX-r.left:r.width/2)-14+"px";
+ s.style.top=(ev.clientY?ev.clientY-r.top:r.height/2)-20+"px";
+ b.appendChild(s);setTimeout(()=>s.remove(),800);draw();
+});
+$("reset").onclick=()=>{if(confirm("Удалить весь прогресс и начать заново?")){S=fresh();save();drawAch();draw();}};
+function draw(){check();drawStk();
+ $("money").textContent=fmt(S.m)+" ₽";
+ const r=ips();$("ips").textContent="Доход: "+fmt(r)+" ₽ в секунду";
+ $("cp").textContent="+"+fmt(power())+" ₽ за нажатие";
+ let k=0;RANKS.forEach((x,i)=>{if(S.t>=x[0])k=i;});
+ $("rank").textContent=RANKS[k][1];
+ const nx=RANKS[k+1];$("prog").style.width=nx?Math.min(100,(S.t-RANKS[k][0])/(nx[0]-RANKS[k][0])*100)+"%":"100%";
+ const uc=upCost();$("upd").textContent="Уровень "+S.c+": +"+fmt(Math.ceil(Math.pow(1.6,S.c+1)))+" ₽ за нажатие";
+ $("upbtn").textContent=fmt(uc)+" ₽";$("upbtn").disabled=S.m<uc;
+ BIZ.forEach((b,i)=>{const c=cost(i),e=els[i];
+  e.cnt.textContent=S.b[i];e.sub.textContent="+"+fmt(b[2])+" ₽ в сек. каждый";
+  e.btn.textContent="Купить "+fmt(c)+" ₽";e.btn.disabled=S.m<c;});
+}
+const ACH=[
+["Вы пробудили Никитурика","Заработать 1 000 ₽",()=>S.t>=1000],
+["Антоха кран","Заработать 5 000 ₽",()=>S.t>=5000],
+["Спрячь мои ладони","Заработать 10 000 ₽",()=>S.t>=10000],
+["Заброним плойку после работы","Открыть 8-й уровень",()=>S.b[7]>0],
+["Первый миллион","Заработать 1 000 000 ₽",()=>S.t>=1e6],
+["Миллиардер","Заработать 1 000 000 000 ₽",()=>S.t>=1e9],
+["Палец чемпиона","Нажать 1 000 раз",()=>S.k>=1000],
+["Не все яйца в одну корзину","Открыть 5 разных бизнесов",()=>S.b.filter(x=>x>0).length>=5],
+["Коллекционер","Открыть все бизнесы",()=>S.b.every(x=>x>0)],
+["Биржевой волк","Купить первую акцию",()=>S.s.some(x=>x>0)],
+["Инвестор на связи","Забрать бонус от инвестора",()=>S.g>=1],
+["Налоговая тебя нашла","Пережить налоговую проверку",()=>S.x>=1],
+["Монетка улыбнулась","Выиграть в монетку",()=>S.w>=1]];
+let tt;
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),3000);}
+function drawAch(){$("ach").innerHTML=ACH.map((a,i)=>{const on=S.a.includes(i);
+ return '<div class="card ach'+(on?' on':'')+'"><div class="t">'+(on?'🏆':'🔒')+'</div><div class="info"><b>'+(on?a[0]:'???')+'</b><span>'+a[1]+'</span></div></div>';}).join("");}
+function check(){let ch=false;ACH.forEach((a,i)=>{if(!S.a.includes(i)&&a[2]()){S.a.push(i);ch=true;toast("Достижение: "+a[0]);}});if(ch){drawAch();save();}}
+const stk=$("stk"),se=[];
+STK.forEach((t,i)=>{const d=document.createElement("div");d.className="card stk";
+ d.innerHTML='<div class="info"><b></b><span></span></div><div class="row"><button class="buy" type="button">Купить</button><button class="buy" type="button">Макс</button><button class="buy" type="button">Продать всё</button></div>';
+ stk.appendChild(d);const bs=d.querySelectorAll("button");
+ se.push({n:d.querySelector("b"),s:d.querySelector("span"),b:bs});
+ bs[0].onclick=()=>buy(i,1);bs[1].onclick=()=>buy(i,Math.floor(S.m/S.p[i]));
+ bs[2].onclick=()=>{S.m+=S.s[i]*S.p[i];S.s[i]=0;draw();};});
+function buy(i,q){q=Math.min(q,Math.floor(S.m/S.p[i]));if(q>0){S.m-=q*S.p[i];S.s[i]+=q;draw();}}
+let pr=S.p.slice();
+function drawStk(){STK.forEach((t,i)=>{const e=se[i];e.n.textContent=t[0]+" "+t[1];
+ e.s.textContent=fmt(S.p[i])+" ₽ "+(S.p[i]>=pr[i]?"▲":"▼")+", в портфеле: "+S.s[i];
+ e.b[0].disabled=e.b[1].disabled=S.m<S.p[i];e.b[2].disabled=!S.s[i];});}
+setInterval(()=>{pr=S.p.slice();S.p=S.p.map((p,i)=>{const v=STK[i][3],g=(Math.random()+Math.random()+Math.random()-1.5)*2;
+ return Math.max(1,p*Math.exp(v*g-.03*Math.log(p/STK[i][2])));});draw();},3000);
+let gift=0,evTO;
+function evt(a,b,ms,btn){clearTimeout(evTO);$("evt-t").textContent=a;$("evt-s").textContent=b;$("evt").hidden=false;$("evt-b").hidden=!btn;evTO=setTimeout(hideEvt,ms);}
+function hideEvt(){$("evt").hidden=true;$("evt-b").hidden=true;gift=0;}
+$("evt-b").onclick=()=>{S.m+=gift;S.t+=gift;S.g++;toast("Получено "+fmt(gift)+" ₽");hideEvt();clearTimeout(evTO);draw();};
+function fire(){const r=Math.random();
+ if(r<.4){gift=Math.max(100,ips()*60);evt("Инвестор зашёл в гости","Заберите "+fmt(gift)+" ₽, пока он не ушёл",12000,true);}
+ else if(r<.65){mu=2;muEnd=Date.now()+3e4;evt("Ажиотаж на рынке","Доход ×2 на 30 секунд",3e4);}
+ else if(r<.85){mu=.5;muEnd=Date.now()+2e4;evt("Отключили свет","Доход ×0,5 на 20 секунд",2e4);}
+ else{const l=S.m*.05;S.m-=l;S.x++;evt("Налоговая проверка","Списано "+fmt(l)+" ₽ (5% наличных)",6000);}
+ nextEvt();}
+function nextEvt(){setTimeout(fire,45000+Math.random()*45000);}
+nextEvt();
+function tab(n){$("v1").hidden=n!=1;$("v2").hidden=n!=2;$("tb1").classList.toggle("on",n==1);$("tb2").classList.toggle("on",n==2);}
+$("tb1").onclick=()=>tab(1);$("tb2").onclick=()=>tab(2);
+document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{$("bet").value=Math.max(0,Math.floor(S.m*b.dataset.f));});
+let busy=false;
+function flip(side){
+ if(busy)return;const r=$("cres"),b=Math.floor(Number(($("bet").value||"").replace(/\s/g,"")));
+ if(!(b>=1)){r.textContent="Введите ставку от 1 ₽";return;}
+ if(b>S.m){r.textContent="Ставка больше вашего баланса";return;}
+ busy=true;S.m-=b;draw();
+ const c=$("coin");c.textContent="₽";c.classList.remove("spin");void c.offsetWidth;c.classList.add("spin");r.textContent="Монета в воздухе…";
+ setTimeout(()=>{const win=Math.random()<.5,res=win?side:1-side;
+  c.textContent=res?"Р":"О";
+  const nm=res?"Выпала решка. ":"Выпал орёл. ";
+  if(win){S.m+=b*2;S.t+=b;S.w++;r.textContent=nm+"Ставка удвоена: +"+fmt(b)+" ₽";}
+  else r.textContent=nm+"Ставка потеряна: −"+fmt(b)+" ₽";
+  busy=false;draw();},900);}
+$("heads").onclick=()=>flip(0);$("tails").onclick=()=>flip(1);
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+let last=performance.now(),acc=0;
+setInterval(()=>{const n=performance.now(),dt=(n-last)/1000;last=n;
+ const g=ips()*dt;S.m+=g;S.t+=g;draw();acc+=dt;if(acc>3){acc=0;save();}},200);
+addEventListener("pagehide",save);
+drawAch();draw();
+</script>
+</body>
+</html>
