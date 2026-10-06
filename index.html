@@ -56,7 +56,7 @@ h2{font-size:18px;margin:4px 0 0}
 .coin{width:110px;height:110px;margin:0 auto;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9a3,var(--brass));color:var(--brassink);display:grid;place-items:center;font:800 40px "Bricolage Grotesque",sans-serif;box-shadow:inset 0 0 0 6px rgba(0,0,0,.12)}
 .coin.spin{animation:fl .9s ease-in-out}@keyframes fl{to{transform:rotateY(1080deg)}}
 @media(prefers-reduced-motion:reduce){.coin.spin{animation:none}}
-#bet,#gbet{font:500 18px Rubik,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-align:center;width:100%}
+#bet,#gbet,#nick{font:500 18px Rubik,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-align:center;width:100%}
 .tabs{max-width:none;overflow-x:auto}.tab{flex:1 0 auto;padding:10px 14px}.cbox h2{margin:0 0 12px}
 #v2{display:grid;gap:16px}#tarea{position:relative;height:200px;border:1px dashed var(--line);border-radius:12px;overflow:hidden}#tgt{position:absolute;width:48px;height:48px;border-radius:50%;border:0;background:var(--brass);font-size:24px;cursor:pointer;padding:0}
 .coin{width:120px;height:120px;background:repeating-conic-gradient(#d5dadd 0 3deg,#8c969b 3deg 6deg);box-shadow:0 4px 10px rgba(0,0,0,.25);font-size:inherit}
@@ -76,7 +76,7 @@ h2{font-size:18px;margin:4px 0 0}
     <div class="bar"><i id="prog"></i></div>
   </div>
   <div id="evt" class="card" hidden><div class="info"><b id="evt-t"></b><span id="evt-s"></span></div><button class="buy" id="evt-b" type="button" hidden>Забрать</button></div>
-  <div class="tabs"><button class="tab on" id="tb1" type="button">Бизнес</button><button class="tab" id="tb2" type="button">Игры</button><button class="tab" id="tb3" type="button">Биржа</button><button class="tab" id="tb6" type="button">Задания</button><button class="tab" id="tb4" type="button">Достижения</button><button class="tab" id="tb7" type="button">Империя</button><button class="tab" id="tb5" type="button" aria-label="Настройки">⚙</button></div>
+  <div class="tabs"><button class="tab on" id="tb1" type="button">Бизнес</button><button class="tab" id="tb2" type="button">Игры</button><button class="tab" id="tb3" type="button">Биржа</button><button class="tab" id="tb6" type="button">Задания</button><button class="tab" id="tb4" type="button">Достижения</button><button class="tab" id="tb8" type="button">Рейтинг</button><button class="tab" id="tb7" type="button">Империя</button><button class="tab" id="tb5" type="button" aria-label="Настройки">⚙</button></div>
 </div>
 <div class="wrap" id="v1">
   <div>
@@ -109,9 +109,10 @@ h2{font-size:18px;margin:4px 0 0}
   <div id="tarea"><button id="tgt" type="button" hidden aria-label="Мишень">🎯</button></div><button class="buy" id="tstart" type="button">Начать</button></div></div>
 <div class="cbox" id="v3" hidden><h2>Биржа</h2><div id="stk" class="side"></div></div>
 <div class="cbox" id="v4" hidden><h2>Достижения</h2><div id="ach" class="side"></div></div>
-<div class="cbox" id="v5" hidden><div class="pn"><b>Настройки</b><div class="row"><button class="buy" id="snd" type="button"></button><button class="buy" id="vib" type="button"></button></div><button class="buy" id="reset" type="button">Начать заново</button></div></div>
+<div class="cbox" id="v5" hidden><div class="pn"><b>Настройки</b><div class="row"><button class="buy" id="snd" type="button"></button><button class="buy" id="vib" type="button"></button></div><input id="nick" maxlength="30" placeholder="Имя в рейтинге (по умолчанию из Telegram)" aria-label="Имя в рейтинге"><button class="buy" id="reset" type="button">Начать заново</button></div></div>
 <div class="cbox" id="v6" hidden><h2>Задания</h2><div id="qs" class="side"></div></div>
 <div class="cbox" id="v7" hidden><div class="pn"><b>Империя</b><p id="pinfo"></p><button class="buy" id="pbtn" type="button"></button></div></div>
+<div class="cbox" id="v8" hidden><h2>Рейтинг</h2><p id="lbi" style="margin:0 0 12px">Загрузка…</p><div id="lb" class="side"></div><button class="buy" id="lbr" type="button" style="margin-top:12px">Обновить</button></div>
 <div id="toast" role="status"></div>
 <script>
 const BIZ=[
@@ -233,8 +234,8 @@ const EV=[
 function fire(){FX.evt();EV[Math.floor(Math.random()*EV.length)]();nextEvt();}
 function nextEvt(){setTimeout(fire,45000+Math.random()*45000);}
 nextEvt();
-function tab(n){for(let i=1;i<=7;i++){$("v"+i).hidden=i!=n;$("tb"+i).classList.toggle("on",i==n);}}
-for(let i=1;i<=7;i++)$("tb"+i).onclick=()=>tab(i);
+function tab(n){for(let i=1;i<=8;i++){$("v"+i).hidden=i!=n;$("tb"+i).classList.toggle("on",i==n);}}
+for(let i=1;i<=8;i++)$("tb"+i).onclick=()=>{tab(i);if(i==8)loadLB();};
 document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{$("bet").value=Math.max(0,Math.floor(S.m*b.dataset.f));});
 let busy=false;
 function flip(side){
@@ -317,6 +318,30 @@ $("tstart").onclick=()=>{if(tIv)return;th=0;tl=10;S.gm++;$("tgt").hidden=false;m
  tIv=setInterval(()=>{tl--;if(tl>0){$("tres").textContent="Попаданий: "+th+", осталось "+tl+" с";return;}
   clearInterval(tIv);tIv=0;$("tgt").hidden=true;const w=th*Math.max(50,ips()*20);S.m+=w;S.t+=w;
   $("tres").textContent="Попаданий: "+th+". Награда: "+fmt(w)+" ₽";if(th)FX.win();draw();},1000);};
+const SB="https://jyqvxgwsbrgymbrgasoa.supabase.co",SK="sb_publishable_JrmOs5jCIMZr72dNoBXziA_AfWsa8mE";
+const HD={apikey:SK,Authorization:"Bearer "+SK,"Content-Type":"application/json"};
+function tgu(){const w=window.Telegram&&Telegram.WebApp;return w&&w.initDataUnsafe&&w.initDataUnsafe.user;}
+function pid(){const u=tgu();if(u&&u.id)return"tg"+u.id;if(!S.uid)S.uid="w"+Math.random().toString(36).slice(2,12);return S.uid;}
+function pname(){const u=tgu();return String(S.nick||(u&&(u.first_name||u.username))||"Игрок").slice(0,30);}
+function sendLB(){try{return fetch(SB+"/rest/v1/rpc/save_player",{method:"POST",headers:HD,keepalive:true,body:JSON.stringify({p_id:pid(),p_name:pname(),p_total:S.t,p_pp:S.pp||0,p_biz:S.b.reduce((a,x)=>a+x,0)})}).catch(()=>{});}catch(e){return Promise.resolve();}}
+let lbT=0;
+async function loadLB(){const box=$("lb"),inf=$("lbi");if(Date.now()-lbT<5000)return;lbT=Date.now();
+ try{await sendLB();
+  const r=await fetch(SB+"/rest/v1/players?select=name,total,pp,biz&order=total.desc&limit=50",{headers:Object.assign({Prefer:"count=exact"},HD)});
+  if(!r.ok)throw 0;const n=(r.headers.get("content-range")||"").split("/")[1],rows=await r.json();
+  const r2=await fetch(SB+"/rest/v1/players?select=id&total=gt."+encodeURIComponent(S.t),{headers:Object.assign({Prefer:"count=exact",Range:"0-0"},HD)});
+  const place=r2.ok?(+((r2.headers.get("content-range")||"").split("/")[1])||0)+1:"?";
+  inf.textContent="Игроков: "+(n&&n!="*"?n:rows.length)+". Ваше место: "+place;
+  box.textContent="";
+  rows.forEach((p,i)=>{const d=document.createElement("div"),c=document.createElement("div"),f=document.createElement("div"),b=document.createElement("b"),sp=document.createElement("span");
+   d.className="card";c.className="cnt";f.className="info";c.textContent=i+1;b.textContent=p.name;
+   sp.textContent=fmt(p.total)+" ₽, бизнесов: "+p.biz+(p.pp?", очков влияния: "+p.pp:"");f.append(b,sp);d.append(c,f);box.appendChild(d);});
+  if(!rows.length)box.textContent="Пока никого нет";
+ }catch(e){inf.textContent="Не удалось загрузить рейтинг. Проверьте интернет и попробуйте позже.";}}
+$("lbr").onclick=()=>{lbT=0;loadLB();};
+$("nick").value=S.nick||"";
+$("nick").onchange=()=>{S.nick=$("nick").value.trim().slice(0,30);save();lbT=0;sendLB();};
+setTimeout(sendLB,4000);setInterval(sendLB,60000);addEventListener("pagehide",sendLB);
 function save(){try{localStorage.setItem(KEY,JSON.stringify(pack()));}catch(e){}}
 let last=performance.now(),acc=0;
 setInterval(()=>{const n=performance.now(),dt=(n-last)/1000;last=n;
