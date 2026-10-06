@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Империя беников</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Rubik:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#e4ebe2;--g1:#fff;--g2:#b4e68f;--panel:#f4f7f1;--ink:#12342b;--mute:#5b7168;--brass:#b8892b;--brassink:#fff;--line:#c5d2c6;--bad:#a8402b;
@@ -56,6 +57,7 @@ h2{font-size:18px;margin:4px 0 0}
 .coin.spin{animation:fl .9s ease-in-out}@keyframes fl{to{transform:rotateY(1080deg)}}
 @media(prefers-reduced-motion:reduce){.coin.spin{animation:none}}
 #bet{font:500 18px Rubik,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-align:center;width:100%}
+.tabs{max-width:none;overflow-x:auto}.tab{flex:1 0 auto;padding:10px 14px}.cbox h2{margin:0 0 12px}
 [hidden]{display:none!important}.stk{flex-wrap:wrap}.row{display:flex;gap:6px;flex-wrap:wrap}.row .buy{min-width:0;padding:8px 10px}.wrap>div:first-child h2{margin-top:18px}.ach{opacity:.5}.ach.on{opacity:1}.ach .t{font-size:22px}#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--brass);color:var(--brassink);padding:10px 16px;border-radius:12px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .3s;max-width:90%;text-align:center}#toast.show{opacity:1}
 .foot{grid-column:1/-1;text-align:center}
 .foot button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:8px 12px;font:14px Rubik,sans-serif;cursor:pointer}
@@ -70,13 +72,12 @@ h2{font-size:18px;margin:4px 0 0}
     <div class="bar"><i id="prog"></i></div>
   </div>
   <div id="evt" class="card" hidden><div class="info"><b id="evt-t"></b><span id="evt-s"></span></div><button class="buy" id="evt-b" type="button" hidden>Забрать</button></div>
-  <div class="tabs"><button class="tab on" id="tb1" type="button">Бизнес</button><button class="tab" id="tb2" type="button">Монетка</button></div>
+  <div class="tabs"><button class="tab on" id="tb1" type="button">Бизнес</button><button class="tab" id="tb2" type="button">Монетка</button><button class="tab" id="tb3" type="button">Биржа</button><button class="tab" id="tb4" type="button">Достижения</button><button class="tab" id="tb5" type="button" aria-label="Настройки">⚙</button></div>
 </div>
 <div class="wrap" id="v1">
   <div>
     
         <button id="click" type="button">Заработать<small id="cp"></small></button>
-    <h2>Достижения</h2><div id="ach" class="side"></div>
   </div>
   <div class="side">
     <h2>Улучшения</h2>
@@ -84,11 +85,10 @@ h2{font-size:18px;margin:4px 0 0}
       <div class="info"><b>Деловые связи</b><span id="upd"></span></div>
       <button class="buy" id="upbtn" type="button"></button>
     </div>
-    <h2>Биржа</h2><div id="stk" class="side"></div>
     <h2>Бизнесы</h2>
     <div id="list" class="side"></div>
   </div>
-  <div class="foot"><button id="reset" type="button">Начать заново</button></div>
+  
 </div>
 <div class="cbox" id="v2" hidden><div class="pn">
   <div class="coin" id="coin">₽</div>
@@ -97,23 +97,41 @@ h2{font-size:18px;margin:4px 0 0}
   <div class="row"><button class="buy" type="button" data-f="0.1">10%</button><button class="buy" type="button" data-f="0.25">25%</button><button class="buy" type="button" data-f="0.5">50%</button><button class="buy" type="button" data-f="1">Всё</button></div>
   <div class="row"><button class="buy big" id="heads" type="button">Орёл</button><button class="buy big" id="tails" type="button">Решка</button></div>
 </div></div>
+<div class="cbox" id="v3" hidden><h2>Биржа</h2><div id="stk" class="side"></div></div>
+<div class="cbox" id="v4" hidden><h2>Достижения</h2><div id="ach" class="side"></div></div>
+<div class="cbox" id="v5" hidden><div class="pn"><b>Настройки</b><div class="row"><button class="buy" id="snd" type="button"></button><button class="buy" id="vib" type="button"></button></div><button class="buy" id="reset" type="button">Начать заново</button></div></div>
 <div id="toast" role="status"></div>
 <script>
 const BIZ=[
-["Ларек с бенчиками",15,0.1],["Сектор лизинга",100,1],["Сельхозка",1100,8],["Нефтянка",12000,47],
-["Стройка",130000,260],["Оборонка",1.4e6,1400],["Госуха",2e7,7800],["Агава",3.3e8,44000],
-["Нуа",5.1e9,260000],["Туареговая долина",7.5e10,1.6e6],["БэМэВЭЭЭЭЭЭЭ",1e12,1e7],["Владыка банка",1.4e13,6.5e7],
-["Частный остров",2e14,4.3e8],["Бенчики на Луне",3e15,2.9e9],["Центробанк в кармане",5e16,2e10]];
+["Ларек с бенчиками",15,0.1,"lar"],
+["Сектор лизинга",100,1,"leas"],
+["Сельхозка",1100,8,"agro"],
+["Нефтянка",12000,47,"oil"],
+["Стройка",130000,260,"build"],
+["Оборонка",1.4e6,1400,"def"],
+["Госуха",2e7,7800,"gov"],
+["Агава",3.3e8,44000,"agava"],
+["Нуа",5.1e9,260000,"nua"],
+["Туареговая долина",7.5e10,1.6e6,"tuareg"],
+["БэМэВЭЭЭЭЭЭЭ",1e12,1e7,"bmw"],
+["Владыка банка",1.4e13,6.5e7,"bank"],
+["Частный остров",2e14,4.3e8,"island"],
+["Бенчики на Луне",3e15,2.9e9,"moon"],
+["Центробанк в кармане",5e16,2e10,"cb"]];
 const RANKS=[[0,"Лоточник"],[1e3,"Предприниматель"],[2e4,"Владелец бизнеса"],[5e5,"Директор компании"],
 [1e7,"Миллионер"],[3e8,"Магнат"],[1e10,"Миллиардер"],[1e12,"Владелец империи"]];
 const SUF=["","тыс","млн","млрд","трлн","квдр","квнт"];
 function fmt(n){if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n).toString();
  let i=Math.min(Math.floor(Math.log10(n)/3),SUF.length-1);return (n/Math.pow(1000,i)).toFixed(2)+" "+SUF[i];}
 const STK=[["БЕН","Бенчики",100,.05],["НЕФТ","Нефтянка",250,.04],["АГАВ","Агава",1000,.07],["ПЛОЙ","Плойка-Холдинг",60,.08]];
-const fresh=()=>({m:0,t:0,c:0,a:[],k:0,g:0,x:0,w:0,s:STK.map(()=>0),p:STK.map(x=>x[2]),b:BIZ.map(()=>0)});
+const fresh=()=>({m:0,t:0,c:0,a:[],k:0,g:0,x:0,w:0,snd:true,vib:true,s:STK.map(()=>0),p:STK.map(x=>x[2]),b:BIZ.map(()=>0)});
 const KEY="benik1";
 let S=fresh();
-try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&Array.isArray(o.b)&&o.b.length===BIZ.length)S=Object.assign(S,o);}}catch(e){}
+try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&typeof o=="object"){S=Object.assign(S,o);
+ S.b=BIZ.map((x,i)=>o.bz?o.bz[x[3]]||0:(o.b&&o.b[i])||0);
+ S.s=STK.map((x,i)=>o.sz?o.sz[x[0]]||0:(o.s&&o.s[i])||0);
+ S.p=STK.map((x,i)=>(o.pz?o.pz[x[0]]:o.p&&o.p[i])||x[2]);
+ delete S.bz;delete S.sz;delete S.pz;if(!Array.isArray(S.a))S.a=[];}}}catch(e){}
 const $=id=>document.getElementById(id);
 const cost=i=>BIZ[i][1]*Math.pow(1.15,S.b[i]);
 const upCost=()=>25*Math.pow(2.4,S.c);
@@ -125,19 +143,19 @@ BIZ.forEach((b,i)=>{
  d.innerHTML='<div class="cnt"></div><div class="info"><b>'+b[0]+'</b><span></span></div><button class="buy" type="button"></button>';
  list.appendChild(d);
  const e={cnt:d.children[0],sub:d.querySelector("span"),btn:d.querySelector("button")};
- e.btn.onclick=()=>{const c=cost(i);if(S.m>=c){S.m-=c;S.b[i]++;draw();}};
+ e.btn.onclick=()=>{const c=cost(i);if(S.m>=c){S.m-=c;S.b[i]++;FX.buy();draw();}};
  els.push(e);
 });
-$("upbtn").onclick=()=>{const c=upCost();if(S.m>=c){S.m-=c;S.c++;draw();}};
+$("upbtn").onclick=()=>{const c=upCost();if(S.m>=c){S.m-=c;S.c++;FX.buy();draw();}};
 $("click").addEventListener("click",ev=>{
- const p=power();S.m+=p;S.t+=p;S.k++;
+ const p=power();S.m+=p;S.t+=p;S.k++;FX.click();
  const b=$("click"),r=b.getBoundingClientRect(),s=document.createElement("span");
  s.className="pop";s.textContent="+"+fmt(p)+" ₽";
  s.style.left=(ev.clientX?ev.clientX-r.left:r.width/2)-14+"px";
  s.style.top=(ev.clientY?ev.clientY-r.top:r.height/2)-20+"px";
  b.appendChild(s);setTimeout(()=>s.remove(),800);draw();
 });
-$("reset").onclick=()=>{if(confirm("Удалить весь прогресс и начать заново?")){S=fresh();save();drawAch();draw();}};
+$("reset").onclick=()=>{if(confirm("Удалить весь прогресс и начать заново?")){{const q=S.snd,v=S.vib;S=fresh();S.snd=q;S.vib=v;}save();setTog();drawAch();draw();}};
 function draw(){check();drawStk();
  $("money").textContent=fmt(S.m)+" ₽";
  const r=ips();$("ips").textContent="Доход: "+fmt(r)+" ₽ в секунду";
@@ -167,17 +185,17 @@ const ACH=[
 ["Монетка улыбнулась","Выиграть в монетку",()=>S.w>=1]];
 let tt;
 function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),3000);}
-function drawAch(){$("ach").innerHTML=ACH.map((a,i)=>{const on=S.a.includes(i);
+function drawAch(){$("ach").innerHTML=ACH.map((a,i)=>{const on=S.a.includes(a[0]);
  return '<div class="card ach'+(on?' on':'')+'"><div class="t">'+(on?'🏆':'🔒')+'</div><div class="info"><b>'+(on?a[0]:'???')+'</b><span>'+a[1]+'</span></div></div>';}).join("");}
-function check(){let ch=false;ACH.forEach((a,i)=>{if(!S.a.includes(i)&&a[2]()){S.a.push(i);ch=true;toast("Достижение: "+a[0]);}});if(ch){drawAch();save();}}
+function check(){let ch=false;ACH.forEach((a,i)=>{if(!S.a.includes(a[0])&&a[2]()){S.a.push(a[0]);ch=true;toast("Достижение: "+a[0]);FX.ach();}});if(ch){drawAch();save();}}
 const stk=$("stk"),se=[];
 STK.forEach((t,i)=>{const d=document.createElement("div");d.className="card stk";
  d.innerHTML='<div class="info"><b></b><span></span></div><div class="row"><button class="buy" type="button">Купить</button><button class="buy" type="button">Макс</button><button class="buy" type="button">Продать всё</button></div>';
  stk.appendChild(d);const bs=d.querySelectorAll("button");
  se.push({n:d.querySelector("b"),s:d.querySelector("span"),b:bs});
  bs[0].onclick=()=>buy(i,1);bs[1].onclick=()=>buy(i,Math.floor(S.m/S.p[i]));
- bs[2].onclick=()=>{S.m+=S.s[i]*S.p[i];S.s[i]=0;draw();};});
-function buy(i,q){q=Math.min(q,Math.floor(S.m/S.p[i]));if(q>0){S.m-=q*S.p[i];S.s[i]+=q;draw();}}
+ bs[2].onclick=()=>{S.m+=S.s[i]*S.p[i];S.s[i]=0;FX.buy();draw();};});
+function buy(i,q){q=Math.min(q,Math.floor(S.m/S.p[i]));if(q>0){S.m-=q*S.p[i];S.s[i]+=q;FX.buy();draw();}}
 let pr=S.p.slice();
 function drawStk(){STK.forEach((t,i)=>{const e=se[i];e.n.textContent=t[0]+" "+t[1];
  e.s.textContent=fmt(S.p[i])+" ₽ "+(S.p[i]>=pr[i]?"▲":"▼")+", в портфеле: "+S.s[i];
@@ -187,8 +205,8 @@ setInterval(()=>{pr=S.p.slice();S.p=S.p.map((p,i)=>{const v=STK[i][3],g=(Math.ra
 let gift=0,evTO;
 function evt(a,b,ms,btn){clearTimeout(evTO);$("evt-t").textContent=a;$("evt-s").textContent=b;$("evt").hidden=false;$("evt-b").hidden=!btn;evTO=setTimeout(hideEvt,ms);}
 function hideEvt(){$("evt").hidden=true;$("evt-b").hidden=true;gift=0;}
-$("evt-b").onclick=()=>{S.m+=gift;S.t+=gift;S.g++;toast("Получено "+fmt(gift)+" ₽");hideEvt();clearTimeout(evTO);draw();};
-function fire(){const r=Math.random();
+$("evt-b").onclick=()=>{S.m+=gift;S.t+=gift;S.g++;FX.win();toast("Получено "+fmt(gift)+" ₽");hideEvt();clearTimeout(evTO);draw();};
+function fire(){FX.evt();const r=Math.random();
  if(r<.4){gift=Math.max(100,ips()*60);evt("Инвестор зашёл в гости","Заберите "+fmt(gift)+" ₽, пока он не ушёл",12000,true);}
  else if(r<.65){mu=2;muEnd=Date.now()+3e4;evt("Ажиотаж на рынке","Доход ×2 на 30 секунд",3e4);}
  else if(r<.85){mu=.5;muEnd=Date.now()+2e4;evt("Отключили свет","Доход ×0,5 на 20 секунд",2e4);}
@@ -196,24 +214,45 @@ function fire(){const r=Math.random();
  nextEvt();}
 function nextEvt(){setTimeout(fire,45000+Math.random()*45000);}
 nextEvt();
-function tab(n){$("v1").hidden=n!=1;$("v2").hidden=n!=2;$("tb1").classList.toggle("on",n==1);$("tb2").classList.toggle("on",n==2);}
-$("tb1").onclick=()=>tab(1);$("tb2").onclick=()=>tab(2);
+function tab(n){for(let i=1;i<=5;i++){$("v"+i).hidden=i!=n;$("tb"+i).classList.toggle("on",i==n);}}
+for(let i=1;i<=5;i++)$("tb"+i).onclick=()=>tab(i);
 document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{$("bet").value=Math.max(0,Math.floor(S.m*b.dataset.f));});
 let busy=false;
 function flip(side){
  if(busy)return;const r=$("cres"),b=Math.floor(Number(($("bet").value||"").replace(/\s/g,"")));
  if(!(b>=1)){r.textContent="Введите ставку от 1 ₽";return;}
  if(b>S.m){r.textContent="Ставка больше вашего баланса";return;}
- busy=true;S.m-=b;draw();
+ busy=true;FX.flip();S.m-=b;draw();
  const c=$("coin");c.textContent="₽";c.classList.remove("spin");void c.offsetWidth;c.classList.add("spin");r.textContent="Монета в воздухе…";
  setTimeout(()=>{const win=Math.random()<.5,res=win?side:1-side;
   c.textContent=res?"Р":"О";
   const nm=res?"Выпала решка. ":"Выпал орёл. ";
-  if(win){S.m+=b*2;S.t+=b;S.w++;r.textContent=nm+"Ставка удвоена: +"+fmt(b)+" ₽";}
-  else r.textContent=nm+"Ставка потеряна: −"+fmt(b)+" ₽";
+  if(win){S.m+=b*2;S.t+=b;S.w++;FX.win();r.textContent=nm+"Ставка удвоена: +"+fmt(b)+" ₽";}
+  else{FX.lose();r.textContent=nm+"Ставка потеряна: −"+fmt(b)+" ₽";}
   busy=false;draw();},900);}
 $("heads").onclick=()=>flip(0);$("tails").onclick=()=>flip(1);
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+S.a=S.a.map(x=>typeof x=="number"?(ACH[x]||[])[0]:x).filter(Boolean);
+try{const w=window.Telegram&&Telegram.WebApp;if(w){w.ready();w.expand();}}catch(e){}
+let ac;
+function tone(f,d,type,vol,when){if(!S.snd)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state=="suspended")ac.resume();
+ const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+(when||0);o.type=type||"sine";o.frequency.setValueAtTime(f,t);
+ g.gain.setValueAtTime(vol||.08,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+d);}catch(e){}}
+function buzz(k){if(!S.vib)return;try{const h=window.Telegram&&Telegram.WebApp&&Telegram.WebApp.HapticFeedback;
+ if(h){if(k=="ok")h.notificationOccurred("success");else if(k=="bad")h.notificationOccurred("error");else if(k=="warn")h.notificationOccurred("warning");else h.impactOccurred(k);}
+ else if(navigator.vibrate)navigator.vibrate(k=="light"?10:k=="medium"?20:k=="ok"?[30,40,30]:k=="bad"?[60,40,60]:40);}catch(e){}}
+const FX={click(){tone(520,.06,"triangle",.06);buzz("light")},buy(){tone(440,.08,"square",.05);tone(660,.1,"square",.05,.08);buzz("medium")},
+ win(){[523,659,784].forEach((f,i)=>tone(f,.15,"triangle",.08,i*.1));buzz("ok")},
+ lose(){tone(220,.25,"sawtooth",.06);tone(165,.3,"sawtooth",.06,.15);buzz("bad")},
+ ach(){[659,784,988,1319].forEach((f,i)=>tone(f,.18,"triangle",.08,i*.09));buzz("ok")},
+ evt(){tone(880,.1,"sine",.07);tone(660,.15,"sine",.07,.1);buzz("warn")},
+ flip(){tone(700,.05,"square",.04);buzz("light")}};
+function setTog(){$("snd").textContent="Звук: "+(S.snd?"вкл":"выкл");$("vib").textContent="Вибрация: "+(S.vib?"вкл":"выкл");}
+$("snd").onclick=()=>{S.snd=!S.snd;setTog();save();FX.click();};
+$("vib").onclick=()=>{S.vib=!S.vib;setTog();save();buzz("light");};
+setTog();
+function pack(){const o=Object.assign({},S);o.bz=Object.fromEntries(BIZ.map((x,i)=>[x[3],S.b[i]]));
+ o.sz=Object.fromEntries(STK.map((x,i)=>[x[0],S.s[i]]));o.pz=Object.fromEntries(STK.map((x,i)=>[x[0],S.p[i]]));delete o.b;delete o.s;delete o.p;return o;}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(pack()));}catch(e){}}
 let last=performance.now(),acc=0;
 setInterval(()=>{const n=performance.now(),dt=(n-last)/1000;last=n;
  const g=ips()*dt;S.m+=g;S.t+=g;draw();acc+=dt;if(acc>3){acc=0;save();}},200);
