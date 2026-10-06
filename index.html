@@ -58,6 +58,7 @@ h2{font-size:18px;margin:4px 0 0}
 @media(prefers-reduced-motion:reduce){.coin.spin{animation:none}}
 #bet{font:500 18px Rubik,sans-serif;padding:10px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);text-align:center;width:100%}
 .tabs{max-width:none;overflow-x:auto}.tab{flex:1 0 auto;padding:10px 14px}.cbox h2{margin:0 0 12px}
+#v2{display:grid;gap:16px}#tarea{position:relative;height:200px;border:1px dashed var(--line);border-radius:12px;overflow:hidden}#tgt{position:absolute;width:48px;height:48px;border-radius:50%;border:0;background:var(--brass);font-size:24px;cursor:pointer;padding:0}
 [hidden]{display:none!important}.stk{flex-wrap:wrap}.row{display:flex;gap:6px;flex-wrap:wrap}.row .buy{min-width:0;padding:8px 10px}.wrap>div:first-child h2{margin-top:18px}.ach{opacity:.5}.ach.on{opacity:1}.ach .t{font-size:22px}#toast{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--brass);color:var(--brassink);padding:10px 16px;border-radius:12px;font-weight:500;opacity:0;pointer-events:none;transition:opacity .3s;max-width:90%;text-align:center}#toast.show{opacity:1}
 .foot{grid-column:1/-1;text-align:center}
 .foot button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:8px;padding:8px 12px;font:14px Rubik,sans-serif;cursor:pointer}
@@ -72,7 +73,7 @@ h2{font-size:18px;margin:4px 0 0}
     <div class="bar"><i id="prog"></i></div>
   </div>
   <div id="evt" class="card" hidden><div class="info"><b id="evt-t"></b><span id="evt-s"></span></div><button class="buy" id="evt-b" type="button" hidden>Забрать</button></div>
-  <div class="tabs"><button class="tab on" id="tb1" type="button">Бизнес</button><button class="tab" id="tb2" type="button">Монетка</button><button class="tab" id="tb3" type="button">Биржа</button><button class="tab" id="tb4" type="button">Достижения</button><button class="tab" id="tb5" type="button" aria-label="Настройки">⚙</button></div>
+  <div class="tabs"><button class="tab on" id="tb1" type="button">Бизнес</button><button class="tab" id="tb2" type="button">Игры</button><button class="tab" id="tb3" type="button">Биржа</button><button class="tab" id="tb6" type="button">Задания</button><button class="tab" id="tb4" type="button">Достижения</button><button class="tab" id="tb7" type="button">Империя</button><button class="tab" id="tb5" type="button" aria-label="Настройки">⚙</button></div>
 </div>
 <div class="wrap" id="v1">
   <div>
@@ -96,10 +97,17 @@ h2{font-size:18px;margin:4px 0 0}
   <input id="bet" inputmode="numeric" placeholder="Ставка, ₽" aria-label="Ставка в рублях">
   <div class="row"><button class="buy" type="button" data-f="0.1">10%</button><button class="buy" type="button" data-f="0.25">25%</button><button class="buy" type="button" data-f="0.5">50%</button><button class="buy" type="button" data-f="1">Всё</button></div>
   <div class="row"><button class="buy big" id="heads" type="button">Орёл</button><button class="buy big" id="tails" type="button">Решка</button></div>
-</div></div>
+</div>
+<div class="pn"><b>Угадай число</b><p id="gres">Поставьте на число от 1 до 5. Угадаете, и ставка вернётся ×4,5.</p>
+  <input id="gbet" inputmode="numeric" placeholder="Ставка, ₽" aria-label="Ставка в рублях">
+  <div class="row"><button class="buy" type="button" data-g="1">1</button><button class="buy" type="button" data-g="2">2</button><button class="buy" type="button" data-g="3">3</button><button class="buy" type="button" data-g="4">4</button><button class="buy" type="button" data-g="5">5</button></div></div>
+<div class="pn"><b>Тир на скорость</b><p id="tres">Попадайте по мишени 10 секунд. Награда зависит от вашего дохода.</p>
+  <div id="tarea"><button id="tgt" type="button" hidden aria-label="Мишень">🎯</button></div><button class="buy" id="tstart" type="button">Начать</button></div></div>
 <div class="cbox" id="v3" hidden><h2>Биржа</h2><div id="stk" class="side"></div></div>
 <div class="cbox" id="v4" hidden><h2>Достижения</h2><div id="ach" class="side"></div></div>
 <div class="cbox" id="v5" hidden><div class="pn"><b>Настройки</b><div class="row"><button class="buy" id="snd" type="button"></button><button class="buy" id="vib" type="button"></button></div><button class="buy" id="reset" type="button">Начать заново</button></div></div>
+<div class="cbox" id="v6" hidden><h2>Задания</h2><div id="qs" class="side"></div></div>
+<div class="cbox" id="v7" hidden><div class="pn"><b>Империя</b><p id="pinfo"></p><button class="buy" id="pbtn" type="button"></button></div></div>
 <div id="toast" role="status"></div>
 <script>
 const BIZ=[
@@ -124,7 +132,7 @@ const SUF=["","тыс","млн","млрд","трлн","квдр","квнт"];
 function fmt(n){if(n<1000)return n<10&&n%1?n.toFixed(1):Math.floor(n).toString();
  let i=Math.min(Math.floor(Math.log10(n)/3),SUF.length-1);return (n/Math.pow(1000,i)).toFixed(2)+" "+SUF[i];}
 const STK=[["БЕН","Бенчики",100,.05],["НЕФТ","Нефтянка",250,.04],["АГАВ","Агава",1000,.07],["ПЛОЙ","Плойка-Холдинг",60,.08]];
-const fresh=()=>({m:0,t:0,c:0,a:[],k:0,g:0,x:0,w:0,snd:true,vib:true,s:STK.map(()=>0),p:STK.map(x=>x[2]),b:BIZ.map(()=>0)});
+const fresh=()=>({m:0,t:0,c:0,a:[],k:0,g:0,x:0,w:0,snd:true,vib:true,t0:0,pp:0,pr:0,nb:0,ns:0,gm:0,dd:0,ds:0,qa:[],qb:{},ts:Date.now(),s:STK.map(()=>0),p:STK.map(x=>x[2]),b:BIZ.map(()=>0)});
 const KEY="benik1";
 let S=fresh();
 try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&typeof o=="object"){S=Object.assign(S,o);
@@ -135,15 +143,15 @@ try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&typeof o
 const $=id=>document.getElementById(id);
 const cost=i=>BIZ[i][1]*Math.pow(1.15,S.b[i]);
 const upCost=()=>25*Math.pow(2.4,S.c);
-const power=()=>Math.ceil(Math.pow(1.6,S.c));
-let mu=1,muEnd=0;const ips=()=>BIZ.reduce((a,b,i)=>a+b[2]*S.b[i],0)*(Date.now()<muEnd?mu:1);
+const power=()=>Math.ceil(Math.pow(1.6,S.c)*pm()*(Date.now()<cmEnd?cm:1));
+let mu=1,muEnd=0,cm=1,cmEnd=0;const ips=()=>BIZ.reduce((a,b,i)=>a+b[2]*S.b[i]*bm(S.b[i]),0)*pm()*(Date.now()<muEnd?mu:1);
 const list=$("list"),els=[];
 BIZ.forEach((b,i)=>{
  const d=document.createElement("div");d.className="card";
  d.innerHTML='<div class="cnt"></div><div class="info"><b>'+b[0]+'</b><span></span></div><button class="buy" type="button"></button>';
  list.appendChild(d);
  const e={cnt:d.children[0],sub:d.querySelector("span"),btn:d.querySelector("button")};
- e.btn.onclick=()=>{const c=cost(i);if(S.m>=c){S.m-=c;S.b[i]++;FX.buy();draw();}};
+ e.btn.onclick=()=>{const c=cost(i);if(S.m>=c){S.m-=c;S.b[i]++;S.nb++;FX.buy();draw();}};
  els.push(e);
 });
 $("upbtn").onclick=()=>{const c=upCost();if(S.m>=c){S.m-=c;S.c++;FX.buy();draw();}};
@@ -156,7 +164,7 @@ $("click").addEventListener("click",ev=>{
  b.appendChild(s);setTimeout(()=>s.remove(),800);draw();
 });
 $("reset").onclick=()=>{if(confirm("Удалить весь прогресс и начать заново?")){{const q=S.snd,v=S.vib;S=fresh();S.snd=q;S.vib=v;}save();setTog();drawAch();draw();}};
-function draw(){check();drawStk();
+function draw(){check();drawStk();drawQ();drawP();
  $("money").textContent=fmt(S.m)+" ₽";
  const r=ips();$("ips").textContent="Доход: "+fmt(r)+" ₽ в секунду";
  $("cp").textContent="+"+fmt(power())+" ₽ за нажатие";
@@ -166,7 +174,7 @@ function draw(){check();drawStk();
  const uc=upCost();$("upd").textContent="Уровень "+S.c+": +"+fmt(Math.ceil(Math.pow(1.6,S.c+1)))+" ₽ за нажатие";
  $("upbtn").textContent=fmt(uc)+" ₽";$("upbtn").disabled=S.m<uc;
  BIZ.forEach((b,i)=>{const c=cost(i),e=els[i];
-  e.cnt.textContent=S.b[i];e.sub.textContent="+"+fmt(b[2])+" ₽ в сек. каждый";
+  e.cnt.textContent=S.b[i];{const nx=[10,25,50,100].find(x=>S.b[i]<x);e.sub.textContent="+"+fmt(b[2]*bm(S.b[i]))+" ₽ в сек. каждый"+(nx?", ×2 при "+nx:"");}
   e.btn.textContent="Купить "+fmt(c)+" ₽";e.btn.disabled=S.m<c;});
 }
 const ACH=[
@@ -182,7 +190,10 @@ const ACH=[
 ["Биржевой волк","Купить первую акцию",()=>S.s.some(x=>x>0)],
 ["Инвестор на связи","Забрать бонус от инвестора",()=>S.g>=1],
 ["Налоговая тебя нашла","Пережить налоговую проверку",()=>S.x>=1],
-["Монетка улыбнулась","Выиграть в монетку",()=>S.w>=1]];
+["Монетка улыбнулась","Выиграть в монетку",()=>S.w>=1],
+["Империя продана","Продать империю впервые",()=>S.pr>=1],
+["Постоянный клиент","Забирать награду 3 дня подряд",()=>S.ds>=3],
+["Игрок","Сыграть в мини-игру",()=>S.gm>=1]];
 let tt;
 function toast(t){const e=$("toast");e.textContent=t;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),3000);}
 function drawAch(){$("ach").innerHTML=ACH.map((a,i)=>{const on=S.a.includes(a[0]);
@@ -195,7 +206,7 @@ STK.forEach((t,i)=>{const d=document.createElement("div");d.className="card stk"
  se.push({n:d.querySelector("b"),s:d.querySelector("span"),b:bs});
  bs[0].onclick=()=>buy(i,1);bs[1].onclick=()=>buy(i,Math.floor(S.m/S.p[i]));
  bs[2].onclick=()=>{S.m+=S.s[i]*S.p[i];S.s[i]=0;FX.buy();draw();};});
-function buy(i,q){q=Math.min(q,Math.floor(S.m/S.p[i]));if(q>0){S.m-=q*S.p[i];S.s[i]+=q;FX.buy();draw();}}
+function buy(i,q){q=Math.min(q,Math.floor(S.m/S.p[i]));if(q>0){S.m-=q*S.p[i];S.s[i]+=q;S.ns++;FX.buy();draw();}}
 let pr=S.p.slice();
 function drawStk(){STK.forEach((t,i)=>{const e=se[i];e.n.textContent=t[0]+" "+t[1];
  e.s.textContent=fmt(S.p[i])+" ₽ "+(S.p[i]>=pr[i]?"▲":"▼")+", в портфеле: "+S.s[i];
@@ -206,16 +217,20 @@ let gift=0,evTO;
 function evt(a,b,ms,btn){clearTimeout(evTO);$("evt-t").textContent=a;$("evt-s").textContent=b;$("evt").hidden=false;$("evt-b").hidden=!btn;evTO=setTimeout(hideEvt,ms);}
 function hideEvt(){$("evt").hidden=true;$("evt-b").hidden=true;gift=0;}
 $("evt-b").onclick=()=>{S.m+=gift;S.t+=gift;S.g++;FX.win();toast("Получено "+fmt(gift)+" ₽");hideEvt();clearTimeout(evTO);draw();};
-function fire(){FX.evt();const r=Math.random();
- if(r<.4){gift=Math.max(100,ips()*60);evt("Инвестор зашёл в гости","Заберите "+fmt(gift)+" ₽, пока он не ушёл",12000,true);}
- else if(r<.65){mu=2;muEnd=Date.now()+3e4;evt("Ажиотаж на рынке","Доход ×2 на 30 секунд",3e4);}
- else if(r<.85){mu=.5;muEnd=Date.now()+2e4;evt("Отключили свет","Доход ×0,5 на 20 секунд",2e4);}
- else{const l=S.m*.05;S.m-=l;S.x++;evt("Налоговая проверка","Списано "+fmt(l)+" ₽ (5% наличных)",6000);}
- nextEvt();}
+const EV=[
+ ()=>{gift=Math.max(100,ips()*60);evt("Инвестор зашёл в гости","Заберите "+fmt(gift)+" ₽, пока он не ушёл",12000,true)},
+ ()=>{mu=2;muEnd=Date.now()+3e4;evt("Ажиотаж на рынке","Доход ×2 на 30 секунд",3e4)},
+ ()=>{mu=3;muEnd=Date.now()+15e3;evt("Антоха кран приехал на объект","Доход ×3 на 15 секунд",15e3)},
+ ()=>{cm=5;cmEnd=Date.now()+2e4;evt("Никитурик проснулся","Нажатия ×5 на 20 секунд",2e4)},
+ ()=>{const l=ips()*30;S.m+=l;S.t+=l;evt("Туареговая долина выдала премию","+"+fmt(l)+" ₽",6000)},
+ ()=>{mu=.5;muEnd=Date.now()+2e4;evt("Отключили свет","Доход ×0,5 на 20 секунд",2e4)},
+ ()=>{const l=S.m*.05;S.m-=l;S.x++;evt("Налоговая проверка","Списано "+fmt(l)+" ₽ (5% наличных)",6000)},
+ ()=>{const l=S.m*.03;S.m-=l;evt("БэМэВЭЭЭЭЭЭЭ в сервисе","Ремонт обошёлся в "+fmt(l)+" ₽",6000)}];
+function fire(){FX.evt();EV[Math.floor(Math.random()*EV.length)]();nextEvt();}
 function nextEvt(){setTimeout(fire,45000+Math.random()*45000);}
 nextEvt();
-function tab(n){for(let i=1;i<=5;i++){$("v"+i).hidden=i!=n;$("tb"+i).classList.toggle("on",i==n);}}
-for(let i=1;i<=5;i++)$("tb"+i).onclick=()=>tab(i);
+function tab(n){for(let i=1;i<=7;i++){$("v"+i).hidden=i!=n;$("tb"+i).classList.toggle("on",i==n);}}
+for(let i=1;i<=7;i++)$("tb"+i).onclick=()=>tab(i);
 document.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{$("bet").value=Math.max(0,Math.floor(S.m*b.dataset.f));});
 let busy=false;
 function flip(side){
@@ -250,14 +265,53 @@ function setTog(){$("snd").textContent="Звук: "+(S.snd?"вкл":"выкл");
 $("snd").onclick=()=>{S.snd=!S.snd;setTog();save();FX.click();};
 $("vib").onclick=()=>{S.vib=!S.vib;setTog();save();buzz("light");};
 setTog();
-function pack(){const o=Object.assign({},S);o.bz=Object.fromEntries(BIZ.map((x,i)=>[x[3],S.b[i]]));
+function pack(){const o=Object.assign({},S);o.ts=Date.now();o.bz=Object.fromEntries(BIZ.map((x,i)=>[x[3],S.b[i]]));
  o.sz=Object.fromEntries(STK.map((x,i)=>[x[0],S.s[i]]));o.pz=Object.fromEntries(STK.map((x,i)=>[x[0],S.p[i]]));delete o.b;delete o.s;delete o.p;return o;}
+const bm=n=>Math.pow(2,[10,25,50,100].filter(x=>n>=x).length);
+const pm=()=>1+.1*(S.pp||0);
+const runE=()=>S.t-(S.t0||0),pGain=()=>Math.floor(Math.sqrt(Math.max(0,runE())/1e6));
+function drawP(){const g=pGain();$("pinfo").textContent="Очки влияния: "+S.pp+" (доход +"+S.pp*10+"%). Продаж империи: "+S.pr+". За этот забег вы заработали "+fmt(runE())+" ₽. Если продать империю сейчас, получите очков: "+g+". Деньги, бизнесы, акции и улучшения сбросятся, достижения и очки останутся.";
+ $("pbtn").textContent="Продать империю (+"+g+")";$("pbtn").disabled=g<1;}
+$("pbtn").onclick=()=>{const g=pGain();if(g<1||!confirm("Продать империю и получить очков влияния: "+g+"?"))return;
+ S.pp+=g;S.pr++;Object.assign(S,{m:0,c:0,b:BIZ.map(()=>0),s:STK.map(()=>0),p:STK.map(x=>x[2]),t0:S.t});save();FX.ach();toast("Империя продана. Очки влияния: +"+g);drawAch();draw();};
+const day=()=>Math.floor(Date.now()/864e5);
+const dn=()=>S.dd==day()-1?(S.ds||0)+1:1;
+const dAmt=n=>Math.max(1000,ips()*900)*(1+.25*Math.min(n-1,6));
+const QP=[["Нажать 200 раз","k",200],["Купить 5 бизнесов","nb",5],["Выиграть 2 раза в монетку","w",2],["Купить акции 3 раза","ns",3],["Забрать бонус инвестора","g",1],["Сыграть 3 раза в мини-игры","gm",3]];
+const qprog=i=>Math.min(QP[i][2],(S[QP[i][1]]||0)-(S.qb[i]||0)),qrw=()=>Math.max(2000,ips()*300);
+let qh="";
+function qInit(){while(S.qa.length<3){const c=QP.map((q,i)=>i).filter(i=>!S.qa.includes(i));const i=c[Math.floor(Math.random()*c.length)];S.qa.push(i);S.qb[i]=S[QP[i][1]]||0;}}
+function drawQ(){qInit();const cl=S.dd==day();
+ let h='<div class="card"><div class="info"><b>Ежедневная награда</b><span>Серия: '+(S.ds||0)+' дн. Чем длиннее серия, тем больше награда</span></div><button class="buy" data-d="1"'+(cl?' disabled':'')+'>'+(cl?'Завтра снова':'Забрать '+fmt(dAmt(dn()))+' ₽')+'</button></div>';
+ S.qa.forEach(i=>{const q=QP[i],p=qprog(i);h+='<div class="card"><div class="info"><b>'+q[0]+'</b><span>'+p+' из '+q[2]+'</span></div><button class="buy" data-q="'+i+'"'+(p>=q[2]?'':' disabled')+'>Забрать '+fmt(qrw())+' ₽</button></div>';});
+ if(h!==qh){qh=h;$("qs").innerHTML=h;}}
+$("qs").onclick=e=>{const t=e.target.closest("button");if(!t||t.disabled)return;
+ if(t.dataset.d){const n=dn(),a=dAmt(n);S.ds=n;S.dd=day();S.m+=a;S.t+=a;FX.win();toast("Награда: +"+fmt(a)+" ₽");}
+ else{const i=+t.dataset.q;if(qprog(i)>=QP[i][2]){const a=qrw();S.m+=a;S.t+=a;S.qa=S.qa.filter(x=>x!=i);FX.win();toast("Задание выполнено: +"+fmt(a)+" ₽");}}
+ qh="";draw();};
+function offline(){const dt=Math.min((Date.now()-(S.ts||Date.now()))/1000,28800),g=ips()*dt*.5;
+ if(dt>60&&g>=1){S.m+=g;S.t+=g;setTimeout(()=>toast("Пока вас не было: +"+fmt(g)+" ₽"),600);}}
+document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{
+ const bt=Math.floor(Number(($("gbet").value||"").replace(/\s/g,""))),r=$("gres");
+ if(!(bt>=1)){r.textContent="Введите ставку от 1 ₽";return;}
+ if(bt>S.m){r.textContent="Ставка больше вашего баланса";return;}
+ S.m-=bt;S.gm++;const n=1+Math.floor(Math.random()*5);
+ if(n==+b.dataset.g){const w=Math.floor(bt*4.5);S.m+=w;S.t+=w-bt;FX.win();r.textContent="Загадано "+n+". Угадали: +"+fmt(w-bt)+" ₽";}
+ else{FX.lose();r.textContent="Загадано "+n+". Ставка потеряна: −"+fmt(bt)+" ₽";}
+ draw();});
+let th=0,tl=0,tIv=0;
+function mv(){const a=$("tarea"),t=$("tgt");t.style.left=Math.random()*(a.clientWidth-48)+"px";t.style.top=Math.random()*(a.clientHeight-48)+"px";}
+$("tgt").onclick=()=>{th++;FX.click();mv();$("tres").textContent="Попаданий: "+th+", осталось "+tl+" с";};
+$("tstart").onclick=()=>{if(tIv)return;th=0;tl=10;S.gm++;$("tgt").hidden=false;mv();$("tres").textContent="Попаданий: 0, осталось 10 с";
+ tIv=setInterval(()=>{tl--;if(tl>0){$("tres").textContent="Попаданий: "+th+", осталось "+tl+" с";return;}
+  clearInterval(tIv);tIv=0;$("tgt").hidden=true;const w=th*Math.max(50,ips()*20);S.m+=w;S.t+=w;
+  $("tres").textContent="Попаданий: "+th+". Награда: "+fmt(w)+" ₽";if(th)FX.win();draw();},1000);};
 function save(){try{localStorage.setItem(KEY,JSON.stringify(pack()));}catch(e){}}
 let last=performance.now(),acc=0;
 setInterval(()=>{const n=performance.now(),dt=(n-last)/1000;last=n;
  const g=ips()*dt;S.m+=g;S.t+=g;draw();acc+=dt;if(acc>3){acc=0;save();}},200);
 addEventListener("pagehide",save);
-drawAch();draw();
+offline();drawAch();draw();
 </script>
 </body>
 </html>
